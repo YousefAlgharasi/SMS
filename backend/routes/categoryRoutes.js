@@ -1,0 +1,11 @@
+const express = require('express');
+const router = express.Router();
+const { getCategories, getCategoryProducts, renameCategory, deleteCategory } = require('../controllers/categoryController');
+const { protect, inventoryAccess, supervisorAndAbove } = require('../middleware/authMiddleware');
+const { audit } = require('../middleware/auditMiddleware');
+router.use(protect);
+router.get('/', getCategories);
+router.get('/:name/products', getCategoryProducts);
+router.put('/:name/rename', inventoryAccess, audit('RENAME_CATEGORY','products'), renameCategory);
+router.delete('/:name', supervisorAndAbove, audit('DELETE_CATEGORY','products'), deleteCategory);
+module.exports = router;

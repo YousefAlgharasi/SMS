@@ -1,0 +1,10 @@
+const express = require('express');
+const router = express.Router();
+const { getSales, getSale, createSale, getTodaySales } = require('../controllers/salesController');
+const { protect } = require('../middleware/authMiddleware');
+const { audit } = require('../middleware/auditMiddleware');
+router.use(protect);
+router.get('/today', getTodaySales);
+router.route('/').get(getSales).post(audit('CREATE_SALE', 'sales'), createSale);
+router.route('/:id').get(getSale);
+module.exports = router;

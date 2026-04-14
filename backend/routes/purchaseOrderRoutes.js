@@ -1,0 +1,11 @@
+const express = require('express');
+const router = express.Router();
+const { getPurchaseOrders, getPurchaseOrder, createPurchaseOrder, receiveOrder, updateOrderStatus } = require('../controllers/purchaseOrderController');
+const { protect, inventoryAccess } = require('../middleware/authMiddleware');
+const { audit } = require('../middleware/auditMiddleware');
+router.use(protect, inventoryAccess);
+router.route('/').get(getPurchaseOrders).post(audit('CREATE_PO', 'purchase_orders'), createPurchaseOrder);
+router.route('/:id').get(getPurchaseOrder);
+router.put('/:id/receive', audit('RECEIVE_PO', 'purchase_orders'), receiveOrder);
+router.put('/:id/status',  audit('UPDATE_PO_STATUS', 'purchase_orders'), updateOrderStatus);
+module.exports = router;

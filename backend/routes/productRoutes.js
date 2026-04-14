@@ -1,0 +1,12 @@
+const express = require('express');
+const router = express.Router();
+const { getProducts, getProduct, createProduct, updateProduct, deleteProduct, adjustStock, getCategories, getByBarcode } = require('../controllers/productController');
+const { protect, inventoryAccess, supervisorAndAbove } = require('../middleware/authMiddleware');
+const { audit } = require('../middleware/auditMiddleware');
+router.use(protect);
+router.get('/categories', getCategories);
+router.get('/barcode/:barcode', getByBarcode);
+router.route('/').get(getProducts).post(inventoryAccess, audit('CREATE_PRODUCT', 'products'), createProduct);
+router.route('/:id').get(getProduct).put(inventoryAccess, audit('UPDATE_PRODUCT', 'products'), updateProduct).delete(supervisorAndAbove, audit('DELETE_PRODUCT', 'products'), deleteProduct);
+router.put('/:id/stock', inventoryAccess, audit('ADJUST_STOCK', 'inventory'), adjustStock);
+module.exports = router;
